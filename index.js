@@ -263,8 +263,23 @@ app.post('/withdraw', async (req, res) => {
 });
 
 //Log out
-app.delete('/logout', (req, res) => {
-    
+app.delete('/logout', async (req, res) => {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+
+    if(!token) {
+        console.log("tOKEN NÃO ENVIADO: ", token)
+        return res.send(401);
+    }
+
+    try {
+        await db.collection('sessions').deleteOne({token});
+
+        res.status(200)
+        return
+    } catch (error) {
+        res.status(500).send(error);
+        return
+    }
 });
 
 app.listen(5000, () => console.log('App runnig in port 5000'));
